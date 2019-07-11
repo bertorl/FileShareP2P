@@ -1,5 +1,11 @@
 package com.bertorl.client;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.bertorl.client.p2p.Peer;
+
 /**
  * Hello world!
  *
@@ -7,7 +13,12 @@ package com.bertorl.client;
 public class App 
 {
     public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+    {	
+    	ExecutorService executor = Executors.newFixedThreadPool(1);
+    	try {
+			executor.execute(new Peer());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

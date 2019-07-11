@@ -8,6 +8,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.bertorl.server.IOUtils.IOUtils;
+
+//TODO APLICAR PATRÓN SINGLETON AL SERVICIO 
 public class IncomingPeerConnectionService implements Runnable {
 
 	private static final int SERVICE_CONNECTION_PORT = 24601;
@@ -27,7 +30,9 @@ public class IncomingPeerConnectionService implements Runnable {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			peerUUID = reader.readLine();
-			peerIP = socket.getInetAddress().getHostAddress();
+			peerIP = 
+					socket.getInetAddress().getHostAddress();
+			System.out.println(peerIP);
 			reader.close();
 			socket.close();
 
@@ -42,14 +47,13 @@ public class IncomingPeerConnectionService implements Runnable {
 						e.printStackTrace();
 					}
 				});
-				out.println();
-				out.flush();
 				out.close();
 				peerSocket.close();
+				IOUtils.logTableToTextFile(peerTable);
 			}
 
 			else {
-				peerTable.put(peerUUID, peerIP);
+				peerTable.put(peerUUID+"a", peerIP);	
 				peerTable.forEach((k, v) -> {
 					try {
 						Socket multiPeerSocket = new Socket(v, SERVICE_CONNECTION_PORT);
@@ -62,8 +66,6 @@ public class IncomingPeerConnectionService implements Runnable {
 								e.printStackTrace();
 							}
 						});
-						out.println();
-						out.flush();
 						out.close();
 						multiPeerSocket.close();
 					} catch (Exception e) {
