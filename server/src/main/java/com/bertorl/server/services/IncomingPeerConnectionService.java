@@ -1,73 +1,79 @@
 package com.bertorl.server.services;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.bertorl.server.IOUtils.IOUtils;
 
 public class IncomingPeerConnectionService implements Runnable {
 
+	private static final int SERVICE_CONNECTION_PORT = 24601;
 	private Socket socket;
-	private Map<String, String>peerTable;
-	
-	public IncomingPeerConnectionService(Socket socket) {
+	private ConcurrentHashMap<String, String> peerTable;
+
+	public IncomingPeerConnectionService(Socket socket, ConcurrentHashMap<String, String> peerTable) {
 		this.socket = socket;
-		this.peerTable = new ConcurrentHashMap<String,String>();
+		this.peerTable = peerTable;
 	}
 
 	@Override
 	public void run() {
 		String peerUUID = "";
-		String line = "";
+		// String line = "";
+		String peerIP;
 		try {
-			InputStream in = socket.getInputStream();
-			peerUUID = IOUtils.readLine(in);
-			in.close();
-			InputStream inTable = new FileInputStream(new File("data/peer-table.txt"));
-			
-			while (!(line = IOUtils.readLine(inTable)).equals("")) {
-				StringTokenizer st = new StringTokenizer(line, " ");
-				String hashKey = st.nextToken();
-				String peerIP = st.nextToken();
-				peerTable.put(hashKey, peerIP);
-			}
-			inTable.close();
-			
-			if(peerTable.containsKey(peerUUID)) {
-				System.out.println(peerTable.containsKey(peerUUID));
-				Socket s = new Socket("localhost", 24601);
-				OutputStream out = s.getOutputStream();
-				
-				peerTable.forEach((k,v)->{try {
-					out.write((k+" "+v+"\r\n").getBytes());
-					out.flush();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}});
-				out.write("\r\n".getBytes());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			peerUUID = reader.readLine();
+			peerIP = socket.getInetAddress().getHostAddress();
+			reader.close();
+			socket.close();
+
+			if (peerTable.containsKey(peerUUID) && peerTable.get(peerUUID).equals(peerIP)) {
+				Socket peerSocket = new Socket(peerIP, SERVICE_CONNECTION_PORT);
+				PrintWriter out = new PrintWriter(new OutputStreamWriter(peerSocket.getOutputStream()));
+				peerTable.forEach((k, v) -> {
+					try {
+						out.println(k + " " + v);
+						out.flush();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+				out.println();
 				out.flush();
 				out.close();
-				s.close();
+				peerSocket.close();
 			}
-			
+
 			else {
-				System.out.println(peerTable.containsKey(peerUUID));
+				peerTable.put(peerUUID, peerIP);
+				peerTable.forEach((k, v) -> {
+					try {
+						Socket multiPeerSocket = new Socket(v, SERVICE_CONNECTION_PORT);
+						PrintWriter out = new PrintWriter(new OutputStreamWriter(multiPeerSocket.getOutputStream()));
+						peerTable.forEach((key, value) -> {
+							try {
+								out.println(key + " " + value);
+								out.flush();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						});
+						out.println();
+						out.flush();
+						out.close();
+						multiPeerSocket.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
 			}
-			
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-	
 }
