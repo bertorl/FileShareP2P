@@ -52,7 +52,8 @@ public class IncomingPeerConnectionService implements Runnable {
 				IOUtils.logTableToTextFile(peerTable);
 			}
 
-			else {
+			else {	
+				//la "a" es para testear un id distinto (hashMap no permite keys iguales con distintos valores)
 				peerTable.put(peerUUID+"a", peerIP);	
 				peerTable.forEach((k, v) -> {
 					try {
