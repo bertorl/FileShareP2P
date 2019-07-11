@@ -1,8 +1,11 @@
 package com.bertorl.client.IOUtils;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +14,8 @@ import java.io.PrintWriter;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class IOUtils {
 
@@ -97,5 +102,25 @@ public class IOUtils {
 		writer.close();
 		return peerUUID;
 
+	}
+	
+	public static String zipSharedFile(String filePath) throws Exception {
+
+		String zipFilePath = filePath+".zip";
+		FileOutputStream fileOut = new FileOutputStream(zipFilePath);
+		ZipOutputStream zipOut = new ZipOutputStream(fileOut);
+		
+		zipOut.putNextEntry(new ZipEntry(filePath));
+		BufferedInputStream buffIn = new BufferedInputStream(new FileInputStream(filePath));
+		byte[] bytes = new byte[1024]; //1KB
+		while(buffIn.read(bytes) >-1) {
+			zipOut.write(bytes, 0, bytes.length);
+		}
+		buffIn.close();
+		zipOut.closeEntry();
+		zipOut.close();
+		
+		return zipFilePath;
+		
 	}
 }

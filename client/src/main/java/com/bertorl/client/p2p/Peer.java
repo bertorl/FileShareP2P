@@ -1,12 +1,20 @@
 package com.bertorl.client.p2p;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.bertorl.client.IOUtils.IOUtils;
 import com.bertorl.client.services.ListenNodeServerConnectionService;
@@ -35,6 +43,19 @@ public class Peer implements Runnable {
 			out.flush();
 			out.close();
 			peerConnectionToServer.close();
+			
+			
+			//Fichero de prueba
+			String filePath = "data/video.mp4";
+			// Prueba comprimir fichero y enviar
+			// TODO clase: peerWorker -> Realiza las petciones y envios de datos a otros peers
+			try {
+				String zipFilePath = IOUtils.zipSharedFile(filePath);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
