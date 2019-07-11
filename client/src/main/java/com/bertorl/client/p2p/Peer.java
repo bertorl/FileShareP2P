@@ -17,6 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.bertorl.client.IOUtils.IOUtils;
+import com.bertorl.client.IOUtils.FileUtiles.FileUtils;
 import com.bertorl.client.services.ListenNodeServerConnectionService;
 
 public class Peer implements Runnable {
@@ -36,13 +37,13 @@ public class Peer implements Runnable {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		
 		try {
-			executor.execute(new ListenNodeServerConnectionService(peerTable));
-			Socket peerConnectionToServer = new Socket(LOCALHOST, PEER_CONNECTION_TO_SERVER_PORT);
-			PrintWriter out = new PrintWriter(new OutputStreamWriter(peerConnectionToServer.getOutputStream()));
-			out.print(peerUUID);
-			out.flush();
-			out.close();
-			peerConnectionToServer.close();
+//			executor.execute(new ListenNodeServerConnectionService(peerTable));
+//			Socket peerConnectionToServer = new Socket(LOCALHOST, PEER_CONNECTION_TO_SERVER_PORT);
+//			PrintWriter out = new PrintWriter(new OutputStreamWriter(peerConnectionToServer.getOutputStream()));
+//			out.print(peerUUID);
+//			out.flush();
+//			out.close();
+//			peerConnectionToServer.close();
 			
 			
 			//Fichero de prueba
@@ -51,13 +52,14 @@ public class Peer implements Runnable {
 			// TODO clase: peerWorker -> Realiza las petciones y envios de datos a otros peers
 			try {
 				String zipFilePath = IOUtils.zipSharedFile(filePath);
+				FileUtils.fragmentFileInParts(10, filePath);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
