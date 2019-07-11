@@ -14,7 +14,7 @@ public class App
 {
     public static void main( String[] args )
     {	
-    	ExecutorService executor = Executors.newFixedThreadPool(1);
+    	ExecutorService executor = Executors.newSingleThreadExecutor();
     	try {
 			executor.execute(new Peer());
 		} catch (IOException e) {

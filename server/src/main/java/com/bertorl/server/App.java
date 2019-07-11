@@ -16,7 +16,7 @@ public class App
 	public static void main( String[] args ) throws IOException {
 		
 		ServerSocket server = new ServerSocket(INIT_CONNECTION_PORT);;
-    	ExecutorService executor = Executors.newFixedThreadPool(1);
+    	ExecutorService executor = Executors.newSingleThreadExecutor();
     	ConcurrentHashMap<String, String>peerTable = IOUtils.loadPeerTable();
     	
         while(true) {

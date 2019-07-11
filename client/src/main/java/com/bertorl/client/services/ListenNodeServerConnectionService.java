@@ -29,7 +29,7 @@ public class ListenNodeServerConnectionService implements Runnable {
 	public void run() {
 		ServerSocket peerListen = null;
 		try {
-			ExecutorService executor = Executors.newFixedThreadPool(1);
+			ExecutorService executor = Executors.newSingleThreadExecutor();
 			peerListen = new ServerSocket(SERVICE_CONNECTION_PORT);	
 			boolean var = true;
 			while (var) {

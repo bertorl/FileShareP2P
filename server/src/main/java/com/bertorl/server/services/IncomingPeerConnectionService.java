@@ -72,6 +72,7 @@ public class IncomingPeerConnectionService implements Runnable {
 						e.printStackTrace();
 					}
 				});
+				IOUtils.logTableToTextFile(peerTable);
 			}
 
 		} catch (IOException e) {
