@@ -53,6 +53,9 @@ public class Peer implements Runnable {
 			try {
 				String zipFilePath = IOUtils.zipSharedFile(filePath);
 				FileUtils.fragmentFileInParts(10, filePath);
+				System.out.println("finnn1");
+				FileUtils.mountingFragmentsIntoFile("data/fragments", 10);
+				System.out.println("finnn2");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
